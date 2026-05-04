@@ -68,8 +68,8 @@ For each detected hill (position + azimuth from Stage 2):
 ```
 Input: multibeam *.mbxxx files  +  track waypoint file  +  blacklist.asc
          ↓
-[Stage 1]  radon.pl  →  radon.c  →  Output/*.radon.out
-                                     Output/*.multibeam.asc (cached grid)
+[Stage 1]  radon.pl  →  radon.c  →  output/*.radon.out
+                                     output/*.multibeam.asc (cached grid)
          ↓
 [Stage 2]  Maxima/maxima.m  →  Maxima/local_maxima.trackN
          ↓
@@ -103,12 +103,12 @@ User-configurable variables at the top (must edit before running):
 | `@ylow`, `@yhig` | Latitude bounds for each segment |
 | `@orientation` | 0 = N–S track, 1 = E–W track (affects MATLAB sorting) |
 | `$region` | Name prefix for output files (e.g. `MAR_28N`) |
-| `$radius` | Radon integration radius in **meters** (default 5000 = 5 km) |
+| `$radius` | Grid bounds padding radius in **meters** (default 5000 = 5 km); expands the gridding extent so enough data surrounds the track. Not the Radon integration radius — that is `INC_RADIUS` hard-coded in `radon.c` (10 km). Set `$radius` ≥ `INC_RADIUS` to avoid edge truncation of Radon integrals. |
 | `$res` | Bathymetry grid resolution in **meters** (default 150) |
 | `$num_tracks` | How many `track1`, `track2`, … files exist |
 
 Logic flow:
-1. Computes extended bounds `$xmin2/$xmax2/$ymin2/$ymax2` = bounds + Radon radius (to include data around the edges).
+1. Computes extended bounds `$xmin2/$xmax2/$ymin2/$ymax2` = bounds + `$radius` padding (to include data around the track edges for Radon integration).
 2. If `$pre.multibeam.asc` does not exist: runs `mbdatalist` + `mbgrid3` to create it. **Delete the .asc file to force re-gridding.**
 3. Calls `blacklist.pl` to mask blacklisted rectangles → `.asc.bl`.
 4. Reads the `.asc.bl` file into `@datax`, `@datay`, `@dataz` arrays, detecting grid dimensions from x-value changes.
@@ -357,17 +357,17 @@ Same as above but for flow-line transects spanning both ridge flanks (Pacific + 
 
 ### 5.2 Stage 1 Outputs
 
-**`Output/{pre}.multibeam.asc`**: Gridded bathymetry in xyz ASCII format with a 4-line mbgrid header. Columns: lon, lat, depth (meters, negative = ocean). NaN cells written as a large positive value (≥99000).
+**`output/{pre}.multibeam.asc`**: Gridded bathymetry in xyz ASCII format with a 4-line mbgrid header. Columns: lon, lat, depth (meters, negative = ocean). NaN cells written as a large positive value (≥99000).
 
-**`Output/{pre}.multibeam.asc.bl`**: Same as above after blacklist masking.
+**`output/{pre}.multibeam.asc.bl`**: Same as above after blacklist masking.
 
-**`Output/{pre}.track{N}.radon.out`**: Four-column whitespace-delimited text, one row per (track_point × azimuth):
+**`output/{pre}.track{N}.radon.out`**: Four-column whitespace-delimited text, one row per (track_point × azimuth):
 ```
 azimuth  latitude  radon_value  longitude
 ```
 Azimuth ranges 1°–179° (compass bearing, clockwise from north). Radon value is the mean bathymetric anomaly (meters) along lines at that azimuth through the track point.
 
-**`Output/{pre}.track{N}.stats`**: 12-column text, one row per track point:
+**`output/{pre}.track{N}.stats`**: 12-column text, one row per track point:
 ```
 lon  lat  n_10km  mean_10km  std_10km  rms_10km  rms_err_10km  n_20km  mean_20km  std_20km  rms_20km  rms_err_20km
 ```
@@ -415,7 +415,9 @@ no.  longitude  latitude  distance  profile-len  min-depth  max-depth  conv
 ## 6. Key Configuration Choices and Gotchas
 
 ### Radon radius vs. grid resolution
-`$radius` in `radon.pl` should be ~half the swath width (5 km is typical for 10 km-wide swaths). Setting it too large includes off-axis topography; too small gives noisy Radon integrals with few data points.
+`$radius` in `radon.pl` controls grid bounds padding — it widens the area gridded around the track so that Radon integration lines don't run off the edge of the data. It is **not** the Radon integration radius; that is `INC_RADIUS = 10000 m` hard-coded in `radon.c` and cannot be changed without recompiling.
+
+Rule of thumb: set `$radius` ≥ `INC_RADIUS` (i.e., ≥ 10 km) to ensure integration lines always land inside the grid. The default 5 km is undersized relative to `INC_RADIUS` and can cause truncated integrals near the track endpoints. Setting `$radius` much larger than `INC_RADIUS` wastes memory and gridding time without improving results.
 
 ### The radon.h recompile pattern
 Every run of `radon.pl` overwrites `radon.h` and recompiles `radon.c`. This is by design — NUMX and NUMY are compile-time array sizes. If you abort mid-run, `radon.h` may be inconsistent with the grid. Always let `radon.pl` run to completion or delete `radon.h` before re-running.

@@ -22,9 +22,9 @@ The analysis runs in three sequential stages, each in its own directory:
 Orchestrates multibeam gridding and Radon transform computation.
 1. Edit user-defined variables at the top of `radon.pl`: lon/lat bounds (`@xlow`, `@xhig`, `@ylow`, `@yhig`), `$region`, `$radius`, `$res`, `$num_tracks`
 2. Run: `./radon.pl`
-3. Outputs land in `Output/` as `*.radon.out` files (one per track segment)
+3. Outputs land in `output/` as `*.radon.out` files (one per track segment)
 
-Key behavior: if `Output/*.multibeam.asc` already exists, gridding is skipped. Delete it to force regridding.
+Key behavior: if `output/*.multibeam.asc` already exists, gridding is skipped. Delete it to force regridding.
 
 ### Stage 2 — Wavelet Maxima (`Maxima/maxima.m`)
 Computes the wavelet (Ridgelet) transform of Radon output to locate hill positions, azimuths, and estimated widths.
@@ -55,7 +55,7 @@ Codes/           # Working directory — run the pipeline from here
   blacklist.asc  # Regions to exclude (lon_min lon_max lat_min lat_max, one per line)
   file_list      # Full paths to input *.mbxxx multibeam data files
   track1..N      # Ship-track or synthetic flow-line coordinates
-  Output/        # Stage 1 outputs (created automatically)
+  output/        # Stage 1 outputs (created automatically)
   Maxima/        # Stage 2: MATLAB wavelet scripts
   Shape_analysis/ # Stage 3: Python cross-section analysis + Perl orchestration
 
