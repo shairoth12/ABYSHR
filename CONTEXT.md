@@ -1,4 +1,4 @@
-# ABYSHR — LLM Context Document
+# AbyssMorph — LLM Context Document
 
 **Purpose of this file:** Dense reference for language models working in this repo. Covers the scientific method, every code file, all data formats, configuration variables, and non-obvious implementation details.
 

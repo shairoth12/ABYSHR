@@ -1,4 +1,4 @@
-# ABYSHR — Abyssal Hill Shape Analysis
+# AbyssMorph — Abyssal Hill Shape Analysis
 
 Pipeline for detecting and characterizing **abyssal hill morphology** from multibeam sonar data. Implements the Ridgelet Transform method (Downey & Clayton, *G3*, 2007) extended with cross-section shape analysis (Roth et al., 2019).
 

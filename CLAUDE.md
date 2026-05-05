@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-ABYSHR is a scientific pipeline for detecting and analyzing **abyssal hill morphology** on the ocean floor. It implements the Ridgelet Transform method (Downey & Clayton, G3, 2007) extended with shape analysis (Roth et al., 2019). Input is multibeam sonar data; output is hill geometry statistics (width, height, asymmetry) along a survey track.
+AbyssMorph is a scientific pipeline for detecting and analyzing **abyssal hill morphology** on the ocean floor. It implements the Ridgelet Transform method (Downey & Clayton, G3, 2007) extended with shape analysis (Roth et al., 2019). Input is multibeam sonar data; output is hill geometry statistics (width, height, asymmetry) along a survey track.
 
 ## Required External Dependencies
 
@@ -81,7 +81,7 @@ Example/         # Same structure as Codes/ but pre-populated with expected outp
 
 ### Issue tracker
 
-Issues live in GitHub Issues (`shairoth12/ABYSHR`). See `docs/agents/issue-tracker.md`.
+Issues live in GitHub Issues (`shairoth12/AbyssMorph`). See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
